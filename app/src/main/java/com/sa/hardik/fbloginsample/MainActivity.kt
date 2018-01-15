@@ -4,7 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
-import com.facebook.*
+import com.bumptech.glide.Glide
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.GraphRequest
 import com.facebook.internal.ImageRequest
 import com.facebook.login.LoginManager
 import com.facebook.login.LoginResult
@@ -18,7 +22,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        FacebookSdk.sdkInitialize(applicationContext)
+
 
         LoginManager.getInstance().registerCallback(callbackManager,
                 object : FacebookCallback<LoginResult> {
@@ -26,12 +30,15 @@ class MainActivity : AppCompatActivity() {
                         Log.e("state", "success")
                         val request = GraphRequest.newMeRequest(
                                 loginResult.accessToken
-                        ) { `object`, response ->
+                        ) { userObject, response ->
 
                             Log.e("loginResult.accessToken", loginResult.accessToken.toString())
                             Log.e("response", response.rawResponse)
-                            Log.e("response", `object`.toString())
-                            ImageRequest.getProfilePictureUri("1824363800970345", 500, 500)
+                            Log.e("response", userObject.toString())
+                            Glide.with(this@MainActivity)
+                                    .load(ImageRequest.getProfilePictureUri(userObject["id"].toString(), 100, 100))
+                                    .into(imageView)
+
                         }
                         val parameters = Bundle()
                         parameters.putString("fields", "id,name,link,birthday,first_name,last_name,location")
